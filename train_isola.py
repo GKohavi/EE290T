@@ -33,7 +33,7 @@ class SiameseNetwork(nn.Module):
 	def __init__(self):
 		super(SiameseNetwork, self).__init__()
 		self.cnn1 = nn.Sequential(
-			nn.Conv2d(3, 8, kernel_size=3, padding=1),
+			nn.Conv2d(1, 8, kernel_size=3, padding=1),
 			nn.ReLU(inplace=True),
 			nn.BatchNorm2d(8),
 			
@@ -98,11 +98,11 @@ if train == True:
 			a, b, c = (a.permute(0,3,1,2).to(device).type(torch.float32), 
 					   b.permute(0,3,1,2).to(device).type(torch.float32), c.to(device).type(torch.float)) #for contrastive loss it is 0 for matching pairs	
 			model.zero_grad()
-			pred_c = model(a[:,:3,:,:], b[:,:3,:,:])
+			pred_c = model(a[:,-1:,:,:], b[:,-1:,:,:])
 			loss = criterion(pred_c, c.unsqueeze(1))
 			loss.backward()
 			optimizer.step()
 			avg_loss.append(loss.item())
 		print('epoch', epoch, "loss", np.mean(np.array(avg_loss)))
 
-	torch.save(model, 'model_isola_nodepth')
+		torch.save(model, 'model_isola_onlydepth')
